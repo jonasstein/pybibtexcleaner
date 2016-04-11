@@ -4,6 +4,7 @@ import bibtexparser
 import os.path
 import re
 import argparse
+import sys
 
 def remove_ce(mystring):
     #regex = re.compile(r"ce", re.IGNORECASE)    
@@ -21,8 +22,7 @@ def newfilename(myitem):
     filename = "%s-%s"%(myitem["ID"],cleantitle(myitem["title"]))
     return(filename)
 
-#https://docs.python.org/3/howto/argparse.html
-with open('literature.bib') as bibtex_file:
+with open(sys.argv[1]) as bibtex_file:
     bibtex_str = bibtex_file.read()
 
 bib_database = bibtexparser.loads(bibtex_str)
