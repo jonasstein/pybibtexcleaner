@@ -6,6 +6,7 @@ import re
 import sys
 import string
 import shutil
+#import subprocess
 
 def remove_ce(mystring):
     cleanedstring = re.sub(r"\\ce", "", mystring)
@@ -46,7 +47,13 @@ def isfilename(teststring):
 
     
 if __name__ == "__main__":
-    with open(sys.argv[1]) as bibtex_file:
+    mybibfile = sys.argv[1]
+    mynewbibfile = '%s-new.bib'%mybibfile
+    myoutputfolder = sys.argv[2]
+    
+    shutil.copy2(mybibfile, mynewbibfile)
+    
+    with open(mybibfile) as bibtex_file:
         bibtex_str = bibtex_file.read()
     
     bib_database = bibtexparser.loads(bibtex_str)
@@ -65,7 +72,11 @@ if __name__ == "__main__":
                 print("new filename: %s"%mynewfilename)
                                 
                 if os.path.isfile(fullpathtopaper):
-                    shutil.copy2(fullpathtopaper,"/tmp/test/%s"%mynewfilename)
+                    shutil.copy2(fullpathtopaper, ('%s/%s'%(myoutputfolder,mynewfilename)))
+
+                cmd = "sed -i 's/%s/%s/g' %s"%(fullpathtopaper.replace('/','\/'),mynewfilename.replace('/','\/'),mynewbibfile)
+                print('cmd: ', cmd)                
+                #os.system(cmd)
                 
             else:
                 print("No file.")
