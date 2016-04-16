@@ -33,7 +33,6 @@ def cleantitle(title):
 
 def newfilename(myitem, file_extension):
     basefilename = "%s-%s"%(myitem["ID"],cleantitle(myitem["title"]))
-    print(basefilename)    
     filename = "%s%s"%(basefilename, file_extension.lower())
     return(filename)
 
@@ -45,7 +44,24 @@ def isfilename(teststring):
         onlyvalidchar = onlyvalidchar and (c in valid_chars)
     return onlyvalidchar
 
+
+def replacepath(bibfile, oldpath, newpath):
+    """search and replace oldpath with newpath in a .bib file
+    """
+    filedata = None
+    with open(bibfile, 'r') as infile:
+        filedata = infile.read()
+    infile.close()
     
+    # Replace the target string
+    filedata = filedata.replace(oldpath, newpath)
+    
+    # Write the file out again
+    with open(bibfile, 'w') as outfile:
+        outfile.write(filedata)
+    outfile.close()        
+  
+        
 if __name__ == "__main__":
     mybibfile = sys.argv[1]
     mynewbibfile = '%s-new.bib'%mybibfile
@@ -64,28 +80,19 @@ if __name__ == "__main__":
             print(item["ID"])
     
             if 'file' in item:
-                fullpathtopaper = item["file"].split(":")[1]
-                filename, file_extension = os.path.splitext(fullpathtopaper)
+                oldpath= item["file"].split(":")[1]
+                filename, file_extension = os.path.splitext(oldpath)
                 #print(filename, file_extension)
-                print("old filename: %s"%fullpathtopaper)
-                mynewfilename = newfilename(item, file_extension)
-                print("new filename: %s"%mynewfilename)
-                                
-                if os.path.isfile(fullpathtopaper):
-                    shutil.copy2(fullpathtopaper, ('%s/%s'%(myoutputfolder,mynewfilename)))
-
-                cmd = "sed -i 's/%s/%s/g' %s"%(fullpathtopaper.replace('/','\/'),mynewfilename.replace('/','\/'),mynewbibfile)
-                print('cmd: ', cmd)                
-                #os.system(cmd)
-                
-            else:
-                print("No file.")
+                print("old filename: %s"%oldpath)
+                newpath = '%s%s'%(myoutputfolder,newfilename(item, file_extension))
+                print("new filename: %s"%newpath)
+                if (oldpath == newpath):
+                    print("III: File already renamed. Do nothing.")
+                else:
+                    if os.path.isfile(oldpath):
+                        shutil.copy2(oldpath, newpath)
+                        replacepath(mybibfile, oldpath, newpath)
+                    else:
+                        print("EEE: File not found!")
     
-
-        
-#            if item["title"]:
-                #print(item["title"])
-#            else:
-#                print("Warning: Title is missing!")
-    #,  item["title"], item["file"])
     
