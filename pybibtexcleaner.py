@@ -6,7 +6,7 @@ import re
 import sys
 import string
 import shutil
-#import subprocess
+import unidecode
 
 def remove_ce(mystring):
     cleanedstring = re.sub(r"\\ce", "", mystring)
@@ -14,6 +14,7 @@ def remove_ce(mystring):
 
 def cleantitle(title):
     title = remove_ce(title)
+    title = re.sub(r"$\mu$", "u", title)
     title = re.sub(r" ", "_", title)
     title = re.sub(r"ä", "ae", title)
     title = re.sub(r"ö", "oe", title)
@@ -22,8 +23,7 @@ def cleantitle(title):
     title = re.sub(r"Ä", "Ae", title)
     title = re.sub(r"Ö", "Oe", title)
     title = re.sub(r"Ü", "Ue", title)
-    title = re.sub(r"µ", "mu", title)
-    
+    title = unidecode.unidecode(title)
     valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
     validtitle = ''
     for c in title:
@@ -90,7 +90,8 @@ if __name__ == "__main__":
                     print("III: File already renamed. Do nothing.")
                 else:
                     if os.path.isfile(oldpath):
-                        shutil.copy2(oldpath, newpath)
+                        # shutil.copy2(oldpath, newpath)
+                        shutil.move(oldpath, newpath)
                         replacepath(mybibfile, oldpath, newpath)
                     else:
                         print("EEE: File not found!")
