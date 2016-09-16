@@ -7,6 +7,9 @@ import sys
 import string
 import shutil
 import unidecode
+import configparser
+
+#TODO add basepath ~/my/uni/thesis/blob
 
 def remove_ce(mystring):
     cleanedstring = re.sub(r"\\ce", "", mystring)
@@ -59,41 +62,78 @@ def replacepath(bibfile, oldpath, newpath):
     # Write the file out again
     with open(bibfile, 'w') as outfile:
         outfile.write(filedata)
-    outfile.close()        
+    outfile.close()   
+     
   
+def backupfile(thefilename):
+    """store a copy in filename_ISODATE.bak
+    """
+    thebackupfilename = '%s.bak'%thefilename
+    shutil.copy2(thefilename, thebackupfilename)
+    return(thebackupfilename)
+    
+def printLog(messagetype,message,beVerbose):
+    
+    if beVerbose:
+        print("%s%s%s: %s"%(messagetype,messagetype,messagetype,message))
+    else:
+        if not (messagetype=="I"):
+            print("%s%s%s: %s"%(messagetype,messagetype,messagetype,message))            
+      
+def fixJabRefsRelativePaths(bibfileToFix, relPath):
+    """ replace file        = {:inserted/ with full path
+    """   
+    replacepath(bibfileToFix,"file        = {:inserted/", "file        = {:%sinserted/"%relPath)     
+
         
 if __name__ == "__main__":
-    mybibfile = sys.argv[1]
-    mynewbibfile = '%s-new.bib'%mybibfile
-    myoutputfolder = sys.argv[2]
+    configFileName = 'pybibtexcleaner.ini'
+    justSimulate = False #True    
+    verboseLog = False #True
     
-    shutil.copy2(mybibfile, mynewbibfile)
+    if os.path.isfile(configFileName):
+        config = configparser.ConfigParser()
+        config.read(configFileName)
+    else:
+        sys.exit("Error: Configuration %s not found! Stop execution."%configFileName)
     
-    with open(mybibfile) as bibtex_file:
+    mybibfile = config['PATHS']['bibfileInput']
+    printLog("I", "read bibtex database %s"%mybibfile, verboseLog)
+
+    fixJabRefsRelativePaths(mybibfile, config['PATHS']['relativePathToInserted'])
+
+    if (~justSimulate):
+        myBibfileBackup = backupfile(mybibfile)
+    
+    with open(myBibfileBackup) as bibtex_file:
         bibtex_str = bibtex_file.read()
     
     bib_database = bibtexparser.loads(bibtex_str)
-    #print(bib_database.entries)
+    mydocumentsfolder = config['PATHS']['documentsFolder']
     
     for item in bib_database.entries:
         if item["ENTRYTYPE"]=='article':
-            print(item["ID"])
+            printLog("=", "Processing: %s"%item["ID"], verboseLog)
     
             if 'file' in item:
-                oldpath= item["file"].split(":")[1]
+                oldpath = item["file"].split(":")[1]
+                    
                 filename, file_extension = os.path.splitext(oldpath)
-                #print(filename, file_extension)
-                print("old filename: %s"%oldpath)
-                newpath = '%s%s'%(myoutputfolder,newfilename(item, file_extension))
-                print("new filename: %s"%newpath)
+                newpath = '%s%s'%(mydocumentsfolder, newfilename(item, file_extension))
+                
                 if (oldpath == newpath):
-                    print("III: File already renamed. Do nothing.")
+                    printLog("I", "old filename: %s"%oldpath, verboseLog)
+                    printLog("I", "new filename: %s"%newpath, verboseLog)                    
+                    printLog("I", "File already renamed. Do nothing.", verboseLog)
+                   
                 else:
                     if os.path.isfile(oldpath):
-                        # shutil.copy2(oldpath, newpath)
-                        shutil.move(oldpath, newpath)
-                        replacepath(mybibfile, oldpath, newpath)
+                        if (justSimulate):
+                            printLog("W", "Simulation Mode: mv %s %s"%(oldpath, newpath), verboseLog)
+
+                        else:
+                            shutil.move(oldpath, newpath)
+                            replacepath(mybibfile, oldpath, newpath)
                     else:
-                        print("EEE: File not found!")
-    
-    
+                        printLog("E", "At key %s file not found: %s"%(item["ID"],oldpath), verboseLog)
+                        #print("""find . -name "%s*" -exec mv '{}' %s \;"""%(item["ID"],oldpath))
