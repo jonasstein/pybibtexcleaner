@@ -70,9 +70,9 @@ def replacepath(bibfile, oldpath, newpath):
 
 
 def backupfile(thefilename):
-    """store a copy in filename_ISODATE.bak
+    """store a copy in filename_ISODATE.pybak
     """
-    thebackupfilename = '%s.bak' % thefilename
+    thebackupfilename = '%s.pybak' % thefilename
     shutil.copy2(thefilename, thebackupfilename)
     return(thebackupfilename)
 
