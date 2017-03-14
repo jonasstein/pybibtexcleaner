@@ -18,6 +18,9 @@ def remove_ce(mystring):
 
 
 def cleantitle(title):
+    """First substitute common non ascii characters,
+    then return all ascii letter and numbers of the string
+    """
     title = remove_ce(title)
     title = re.sub(r"$\mu$", "u", title)
     title = re.sub(r" ", "_", title)
