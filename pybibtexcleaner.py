@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+__author__ = "Jonas Stein"
+__copyright__ = "Copyright 2017, Jonas Stein"
+__credits__ = [""]
+__license__ = "GPL-3"
+__version__ = "1.0.1"
+__maintainer__ = "Jonas Stein"
+__email__ = ""
+__status__ = "Testing"
 
 import bibtexparser
 import os
@@ -8,9 +18,6 @@ import string
 import shutil
 import unidecode
 import configparser
-
-# TODO add basepath ~/my/uni/thesis/blob
-
 
 def remove_ce(mystring):
     cleanedstring = re.sub(r"\\ce", "", mystring)
