@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-__author__ = "Jonas Stein"
-__copyright__ = "Copyright 2017, Jonas Stein"
-__credits__ = [""]
-__license__ = "GPL-3"
-__version__ = "1.0.2"
-__maintainer__ = "Jonas Stein"
-__email__ = ""
-__status__ = "Testing"
+"""
+Author: Jonas Stein
+License: GPL-3
+Version: 1.0.2
+"""
 
 import bibtexparser
 import os
@@ -18,6 +14,7 @@ import string
 import shutil
 import unidecode
 import configparser
+
 
 def remove_ce(mystring):
     cleanedstring = re.sub(r"\\ce", "", mystring)
