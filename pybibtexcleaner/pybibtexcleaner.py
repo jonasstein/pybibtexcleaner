@@ -26,7 +26,6 @@ def cleantitle(title):
     then return all ascii letter and numbers of the string
     """
     title = remove_ce(title)
-    title = re.sub(r"$\mu$", "u", title)
     title = re.sub(r" ", "_", title)
     title = re.sub(r"ä", "ae", title)
     title = re.sub(r"ö", "oe", title)
@@ -35,6 +34,7 @@ def cleantitle(title):
     title = re.sub(r"Ä", "Ae", title)
     title = re.sub(r"Ö", "Oe", title)
     title = re.sub(r"Ü", "Ue", title)
+
     title = unidecode.unidecode(title)
     valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
     validtitle = ''
@@ -97,15 +97,16 @@ def printLog(messagetype, message, beVerbose):
 def fixJabRefsRelativePaths(bibfileToFix, relPath):
     """ replace file        = {:inserted/ with full path
     """
+
     replacepath(
         bibfileToFix,
-        "file        = {:inserted/", "file        = {:%sinserted/" % relPath)
+        "= {:inserted/", "= {:%sinserted/" % relPath)
 
 
 if __name__ == "__main__":
     configFileName = 'pybibtexcleaner.ini'
     justSimulate = False  # True
-    verboseLog = False  # True
+    verboseLog = True
 
     if os.path.isfile(configFileName):
         config = configparser.ConfigParser()
@@ -135,8 +136,8 @@ if __name__ == "__main__":
 
             if 'file' in item:
                 oldpath = item["file"].split(":")[1]
-
                 filename, file_extension = os.path.splitext(oldpath)
+                print("Filename", newfilename(item, file_extension))
                 newpath = '%s%s' % (mydocumentsfolder,
                                     newfilename(item, file_extension))
 
