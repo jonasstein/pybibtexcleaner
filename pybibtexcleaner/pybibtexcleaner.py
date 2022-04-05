@@ -3,7 +3,7 @@
 """
 Author: Jonas Stein
 License: GPL-3
-Version: 1.0.2
+Version: 1.0.3
 """
 
 import bibtexparser
@@ -37,7 +37,7 @@ def cleantitle(title):
 
     title = unidecode.unidecode(title)
     valid_chars = "-_.%s%s" % (string.ascii_letters, string.digits)
-    validtitle = ''
+    validtitle: str = ''
     for c in title:
         if (c in valid_chars):
             validtitle = '%s%s' % (validtitle, c)
